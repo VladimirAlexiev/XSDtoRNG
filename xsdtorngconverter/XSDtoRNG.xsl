@@ -163,14 +163,19 @@ knowledge of the CeCILL license and that you accept its terms.
 	</xsl:template>
     
 	<xsl:template match="xs:element[@name]">
-		<!-- case of root element -->
+		<!-- start or root element -->
 		<xsl:choose>
-			<xsl:when test="parent::xs:schema">
+			<xsl:when test="$start and @name=$start or not($start) and parent::xs:schema">
 				<rng:start combine="choice">
 					<!-- must introduce prefix in order not to override a complextype of the same name -->
 					<rng:ref name="starting_{@name}"/>
 				</rng:start>
 				<rng:define name="starting_{@name}">
+					<xsl:apply-templates select="current()" mode="content"/>
+				</rng:define>
+			</xsl:when>
+			<xsl:when test="$start and @name!=$start and parent::xs:schema">
+				<rng:define name="{@name}">
 					<xsl:apply-templates select="current()" mode="content"/>
 				</rng:define>
 			</xsl:when>
